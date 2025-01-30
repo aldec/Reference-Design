@@ -127,7 +127,7 @@ To use logic data profiler with Active-HDL apply the necessary patch and generat
 
 **Figure 8:** Running Vunit simulation in Active-HDL.
 
-**4.2.6** Stop the simulation to obtain Profiler results
+**4.2.5** Stop the simulation to obtain Profiler results
 
 ```endsim```
 
@@ -135,13 +135,13 @@ To use logic data profiler with Active-HDL apply the necessary patch and generat
 
 **Figure 9:** Stopping VUnit sinulation in Active-HDL.
 
-**4.2.7.** In the Active-HDL console type the following command to generate profiler report:
+**4.2.6.** In the Active-HDL console type the following command to generate profiler report:
 
 ```profiler report -tbp $dsn/../../../Profiler/profiler.tbp -html $dsn/../../../Profiler/<profiler_report_name>.html```
 
 Profiler Report will be stored in the aes-encryption/vunit_out/test_output/<specific_test_directory>/Profiler directory.
 
-**4.2.8.** Open Profiler Report file for review the profiling results
+**4.2.7.** Open Profiler Report file for review the profiling results
 
 ![Figure 10: Example Profiler Report in Active-HDL](img/Example_Profiler_Report_in_Active-HDL.png)
 
