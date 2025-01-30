@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
 
-# Importing main vunit library
+# Importing necesarry libraries
+import os
 from vunit import VUnit
+from pathlib import Path
 
 # Add additional module
 import rand_enc
 from rand_enc import prepare_data
+
+# Set the simulator
+simulator = os.environ['VUNIT_SIMULATOR'] = 'rivierapro' # rivierapro | activehdl
+# Set the path to the simulator
+#os.environ['VUNIT_ACTIVEHDL_PATH'] = 'ActiveHDL/bin/directory'
+#os.environ['VUNIT_RIVIERAPRO_PATH'] = 'RivieraPRO/bin/directory'
+
+# Setting root as path to the example directory
+root = Path(__file__).parent
 
 # Create VUnit instance by parsing command line arguments
 vu = VUnit.from_argv()
@@ -18,14 +29,39 @@ vu.add_vhdl_builtins()
 lib = vu.add_library("lib")
 
 # Add all files ending in .vhd in src directory to library
-lib.add_source_files("src/*.vhd")
+lib.add_source_files(root / "src" / "*.vhd")
 
 # Add all files ending in .vhd in tb directory to library
-lib.add_source_files("tb/*.vhd")
+lib.add_source_files(root / "tb" / "*.vhd")
+
+# Helper functions for configure profiling
+def profiling_sim_args(name=None):
+    profiling_dir = root / "profiling_data" / name
+    match simulator:
+        case 'rivierapro' :
+            return ["-profiler_all", "-profiler_dest", f"{{{profiling_dir}}}"]
+        case 'activehdl' :
+            return ["-profiler_all", "-tbp_dest", f"{{{profiling_dir}}}"]
+
+def profiling_options(name):
+    match simulator:
+        case 'rivierapro' :
+            return {"rivierapro.vsim_flags" : profiling_sim_args(name)}
+        case 'activehdl' :
+            return {"activehdl.vsim_flags" : profiling_sim_args(name)}
+
+def enable_profiling(obj, name=None):
+    name = obj.name if name is None else name
+    match simulator:
+        case 'rivierapro' :
+            obj.set_sim_option("rivierapro.vsim_flags", profiling_sim_args(name))
+        case 'activehdl' :
+            obj.set_sim_option("activehdl.vsim_flags", profiling_sim_args(name))
 
 # Hardcoded test
 tb = lib.test_bench("tb_enc_hardcoded")
 test = tb.test("hardcoded encryption test")
+enable_profiling(test)
 
 # Create configuration of the encryption test using golden references from different sources
 tb = lib.test_bench("tb_enc_generics")
@@ -72,6 +108,7 @@ for source, key, plaintext, ciphertext in [
     test.add_config(
         name=source,
         generics=dict(key=key, plaintext=plaintext, expected_ciphertext=ciphertext),
+        sim_options=profiling_options(source)
     )
 
 # Create configuration of the encryption test using random input vectors
@@ -86,10 +123,9 @@ for source, key, plaintext, ciphertext in data_list:
     test.add_config(
         name=source,
         generics=dict(key=key, plaintext=plaintext, expected_ciphertext=ciphertext),
+        sim_options=profiling_options(source)
     )
-
-#Enable design profiler for Aldec's simulators
-#lib.set_sim_option("enable_profiler", True)
 
 # Run vunit main function
 vu.main()
+
