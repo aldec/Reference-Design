@@ -2,19 +2,19 @@
 
 ## 1. Requirements
 
-* Riviera-PRO 2024.04
-* Python 3.7 or higher
-* Ubuntu 2022.04
+* Riviera-PRO 2024.04 or newer
+* Python 3.8 or newer
+* Ubuntu 2022.04 or newer
 
 OR
 
 * Active-HDL 15.0
-* Python 3.7 or higher
-* Windows 10
+* Python 3.8 or newer
+* Windows 10 or newer
 
 ### Verified with:
 
- - VUnit 4.7.0, Riviera-PRO 2024.04-x64, Ubuntu 22.04.4/24.04.1 LTS and Python 3.10.11/3.11.10/3.12.3
+ - VUnit 4.7.0, Riviera-PRO 2024.04-x64/2024.10-x64, Ubuntu 22.04.4/24.04.1 LTS and Python 3.10.11/3.11.10/3.12.3
  
  - VUnit 4.7.0, Active-HDL 15.0-x64, Windows 10/11 and Python 3.12.4/3.12.6.
 
@@ -83,39 +83,25 @@ Replace the 'activehdl.py' in <vunit_hdl_location>/vunit_sim_if with the file ae
 
 ### 4.1. Using Riviera-PRO Logic Data Profiler
 
-To use logic data profiler with Riviera-PRO apply the necessary patch and generate profiler report. Following steps will guide you through the whole process starting from localize vunit_hdl package and replacing necessary files.
+To use logic data profiler with Riviera-PRO generate profiler report. Following steps will guide you through the whole process.
 
-**4.1.1.** ```pip show vunit_hdl```
-
-![Figure 6: Vunit Package location in Ubuntu OS](img/VUnit_Package_location_in_Ubuntu_OS.png)
-
-**Figure 6:** Vunit Package location in Unix OS.
-
-**4.1.2.** Replace files named 'factory.py' and 'rivierapro.py' in <vunit_hdl_location>/vunit/sim_if with the files 'factory.py' and 'rivierapro.py' from aes-encryption/patch directory.
-
-**4.1.3.** Uncomment line 92nd in run.py script to enable logic profiler
-
-![Figure 7: Uncommented line with enabled Data Profiling](img/Uncommented_line_with_enabled_Data_Profiling.png)
-
-**Figure 7:** Uncommented line with enabled Data Profiling.
-
-**4.1.4.** Run the run.py script to generate profiler output files
+**4.1.1.** Run the run.py script to generate profiler output files
 
 ```python3 run.py```
 
-**4.1.5.** Run the Riviera-PRO simulator in aes-encryption directory
+**4.1.2.** Run the Riviera-PRO simulator in aes-encryption directory
 
-**4.1.6.** In the Riviera-PRO console type below command to generate profiler report
+**4.1.3.** In the Riviera-PRO console type below command to generate profiler report
 
-```profiler report -tbp $curdir/vunit_out/test_output/<specific_test_directory>/rivierapro/Profiler/profiler.tbp -html <profiler_report_name>.html```
+```profiler report -tbp $curdir/profiling_data/<specific_test_directory>/profiler.tbp -html <profiler_report_name>.html```
 
 Profiler Report will be stored in the aes-encryption directory.
 
-**4.1.7.** Open Profiler Report file for review the profiling results
+**4.1.4.** Open Profiler Report file for review the profiling results
 
-![Figure 8: Example Profiler Report in Riviera-PRO](img/Example_Profiler_Report_in_Riviera-PRO.png)
+![Figure 6: Example Profiler Report in Riviera-PRO](img/Example_Profiler_Report_in_Riviera-PRO.png)
 
-**Figure 8:** Example Profiler Report in Riviera-PRO.
+**Figure 6:** Example Profiler Report in Riviera-PRO.
 
 ### 4.2 Using Active-HDL Logic Data Profiler
 
@@ -123,37 +109,31 @@ To use logic data profiler with Active-HDL apply the necessary patch and generat
 
 **4.2.1.** pip show vunit_hdl
 
-![Figure 9: Vunit Package location in Windows OS](img/VUnit_Package_location_in_Windows_OS.png)
+![Figure 7: Vunit Package location in Windows OS](img/VUnit_Package_location_in_Windows_OS.png)
 
-**Figure 9:** Vunit Package location in Windows OS.
+**Figure 7:** Vunit Package location in Windows OS.
 
-**4.2.2.** Replace files named 'factory.py' and 'activehdl.py' in <vunit_hdl_location>/vunit/sim_if with the files 'factory.py' and 'activehdl.py' from aes-encryption/patch directory.
+**4.2.2.** Replace file named 'activehdl.py' in <vunit_hdl_location>/vunit/sim_if with the file 'activehdl.py' from aes-encryption/patch directory.
 
-**4.2.3.** Uncomment line 92nd in run.py script to enable logic profiler
-
-![Figure 10: Uncommented line with enabled Data Profiling](img/Uncommented_line_with_enabled_Data_Profiling.png)
-
-**Figure 10:** Uncommented line with enabled Data Profiling.
-
-**4.2.4.** Run the run.py script in GUI mode
+**4.2.3.** Run the run.py script in GUI mode
 
 ```python run.py -g```
 
-**4.2.5.** Run the VUnit simulation via Active-HDL console
+**4.2.4.** Run the VUnit simulation via Active-HDL console
 
 ```run -all```
 
-![Figure 11: Running Vunit simulation in Active-HDL](img/Running_VUnit_simulation_in_Active-HDL.png)
+![Figure 8: Running Vunit simulation in Active-HDL](img/Running_VUnit_simulation_in_Active-HDL.png)
 
-**Figure 11:** Running Vunit simulation in Active-HDL.
+**Figure 8:** Running Vunit simulation in Active-HDL.
 
 **4.2.6** Stop the simulation to obtain Profiler results
 
 ```endsim```
 
-![Figure 12: Stopping VUnit sinulation in Active-HDL](img/Stopping_VUnit_simulation_in_Active-HDL.png)
+![Figure 9: Stopping VUnit sinulation in Active-HDL](img/Stopping_VUnit_simulation_in_Active-HDL.png)
 
-**Figure 12:** Stopping VUnit sinulation in Active-HDL.
+**Figure 9:** Stopping VUnit sinulation in Active-HDL.
 
 **4.2.7.** In the Active-HDL console type the following command to generate profiler report:
 
@@ -163,6 +143,6 @@ Profiler Report will be stored in the aes-encryption/vunit_out/test_output/<spec
 
 **4.2.8.** Open Profiler Report file for review the profiling results
 
-![Figure 13: Example Profiler Report in Active-HDL](img/Example_Profiler_Report_in_Active-HDL.png)
+![Figure 10: Example Profiler Report in Active-HDL](img/Example_Profiler_Report_in_Active-HDL.png)
 
-**Figure 13:** Example Profiler Report in Active-HDL.
+**Figure 10:** Example Profiler Report in Active-HDL.
