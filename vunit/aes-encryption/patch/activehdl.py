@@ -3,7 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 # Copyright (c) 2014-2021, Lars Asplund lars.anders.asplund@gmail.com
-# Aldec, Inc modifictions done on 2024-09-10
+# Aldec, Inc modifictions done on 2023-01-19
 """
 Interface towards Aldec Active HDL
 """
@@ -15,6 +15,7 @@ import re
 import logging
 from ..exceptions import CompileError
 from ..ostools import Process, write_file, file_exists, renew_path
+from ..vhdl_standard import VHDL
 from ..test.suites import get_result_file_name
 from . import SimulatorInterface, ListOfStringOption, StringOption
 from .vsim_simulator_mixin import get_is_test_suite_done_tcl, fix_path
@@ -53,13 +54,6 @@ class ActiveHDLInterface(SimulatorInterface):
         return cls.find_toolchain(["vsim", "avhdl"])
 
     @classmethod
-    def supports_vhdl_call_paths(cls):
-        """
-        Returns True when this simulator supports VHDL-2019 call paths
-        """
-        return True
-
-    @classmethod
     def supports_vhdl_package_generics(cls):
         """
         Returns True when this simulator supports VHDL package generics
@@ -86,7 +80,6 @@ class ActiveHDLInterface(SimulatorInterface):
         self._create_library_cfg()
         self._libraries = []
         self._coverage_files = set()
-        self._profiler_files = set()
 
     def setup_library_mapping(self, project):
         """
@@ -116,7 +109,10 @@ class ActiveHDLInterface(SimulatorInterface):
         """
         Convert standard to format of Active-HDL command line flag
         """
-        return f"-{vhdl_standard!s}"
+        if vhdl_standard <= VHDL.STD_2008:
+            return f"-{vhdl_standard!s}"
+
+        raise ValueError(f"Invalid VHDL standard {vhdl_standard!s}")
 
     def compile_vhdl_file_command(self, source_file):
         """
@@ -253,11 +249,6 @@ class ActiveHDLInterface(SimulatorInterface):
             coverage_file_path = str(Path(output_path) / "coverage.acdb")
             self._coverage_files.add(coverage_file_path)
             vsim_flags += [f"-acdb_file {{{fix_path(coverage_file_path)!s}}}"]
-
-        if config.sim_options.get("enable_profiler", False):
-            profiler_file_path = str(Path(output_path) / "Profiler")
-            self._profiler_files.add(profiler_file_path)
-            vsim_flags += [f"-profiler_all -tbp_dest {{{fix_path(profiler_file_path)!s}}}"]
 
         vsim_flags += [self._vsim_extra_args(config)]
 
