@@ -1,0 +1,5 @@
+__pycache__/
+profiler_report.html
+profiler_report_files/
+profiling_data/
+vunit_out/
