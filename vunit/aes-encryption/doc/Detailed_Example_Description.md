@@ -18,7 +18,7 @@ The source files for this project are available [here](https://github.com/hadipo
 
 ### Verified with:
 
- - VUnit 4.7.0, Riviera-PRO 2024.04-x64, Ubuntu 22.04.4/24.04.1 LTS and Python 3.10.11/3.11.10/3.12.3
+ - VUnit 4.7.0, Riviera-PRO 2024.04-x64/2024.10-x64, Ubuntu 22.04.4/24.04.1 LTS and Python 3.10.11/3.11.10/3.12.3
  
  - VUnit 4.7.0, Active-HDL 15.0-x64, Windows 10/11 and Python 3.12.4/3.12.6.
 
@@ -32,7 +32,7 @@ For more information, visit the official [VUnit website](https://vunit.github.io
 
 - [Introduction to VUnit](https://www.aldec.com/en/company/blog/195--introduction-to-vunit)
 - [Speeding Up Simulation with VUnit for Parallel Testing](https://www.aldec.com/en/company/blog/196--speeding-up-simulation-with-vunit-for-parallel-testing)
-- [Navigating VUnit: A Practical Guide to Modifying Testing Approaches](https://www.aldec.com/en/company/blog/197--navigating-vunit-a-practical-guide-to-modyfing-testing-approaches)
+- [Navigating VUnit: A Practical Guide to Modifying Testing Approaches](https://www.aldec.com/en/company/blog/197--navigating-vunit-a-practical-guide-to-modyfying-testing-approaches)
 
 ## Riviera-PRO
 
@@ -56,13 +56,13 @@ For more information about AES, visit [this page](https://en.wikipedia.org/wiki/
 
 The project consists of:
 
-- source files: placed in src directory, they are all written in VHDL, contains AES encryption procedure, the top module is aes_enc.vhd.
+- source files: placed in [src](https://github.com/aldec/Reference-Design/tree/main/vunit/aes-encryption/src) directory, they are all written in VHDL, contains AES encryption procedure, the top module is aes_enc.vhd.
 
-- testbenches: placed in tb directory, written in VHDL, there are two different files depends on testing approach, tb_enc_hardcoded.vdh file is for hardcoded test case and tb_enc_generics.vhd file is used with randomized and not randomized generics-based test cases.
+- testbenches: placed in [tb](https://github.com/aldec/Reference-Design/tree/main/vunit/aes-encryption/tb) directory, written in VHDL. There are two different files depends on testing approach, tb_enc_hardcoded.vdh file is for hardcoded test case(s) and tb_enc_generics.vhd file is used with randomized and not randomized generics-based test cases.
 
-- Input data randomization script: rand_enc.py, used for create and randomize cipher key and plaintext, and calculation of expected ciphertext for comparison procedure. 
+- Input data randomization script: [rand_enc.py](https://github.com/aldec/Reference-Design/blob/main/vunit/aes-encryption/rand_enc.py), used for create and randomize cipher key and plaintext, and calculation of expected ciphertext for comparison procedure. 
 
-- Python run-script: file named 'run.py', responsible for adding project sources to a library, running different test cases, setting simulation flags and running VUnit main function.
+- Python run-script: file named [run.py](https://github.com/aldec/Reference-Design/blob/main/vunit/aes-encryption/run.py), responsible for adding project sources to a library, running different test cases, setting simulation and compilation options, adding additional functions and running VUnit main function.
 
 - Patch scripts: file named 'activehdl.py', necessary for proper work of multithreading operations in Active-HDL. Should be replacement for 'activehdl.py' file in vunit_hdl library directory (Windows only).
 
@@ -70,7 +70,7 @@ The project consists of:
 
 ## Techniques and Encryption Process
 
-This AES algorithm implementation is based on [this book][1]. It leverages two well-known hardware implementation techniques: pipelining and loop-unrolling. In this example, the loop-unrolling technique is applied. You can learn more about loop-unrolling on this [Wikipedia page](https://en.wikipedia.org/wiki/Loop_unrolling).
+This AES algorithm implementation is based on ["The Design of Rijndael" book][1]. It leverages two well-known hardware implementation techniques: pipelining and loop-unrolling. In this example, the loop-unrolling technique is applied. You can learn more about loop-unrolling technique on this [Wikipedia page](https://en.wikipedia.org/wiki/Loop_unrolling).
 
 For each round of AES encryption, a different sub-key is used as the round key, which is produced by the keyschedule algorithm. There is a dedicated part implementing keyschedule algorithm based on the loop-unrolled technique, to produce the required sub-key for each round on the fly. The AES encryption process is illustrated in the following diagram:
 
@@ -90,7 +90,7 @@ One of the key advantages of using VUnit is its support for multicore simulation
 
 ![Multicore simulation](img/vunit_multithread_multitestbench.png)
 
-The tests consist of multiple testbench files, where VHDL or SV processes are organized into smaller test cases. These test cases can run concurrently on multiple threads, enabling simultaneous data calculation and significantly improving testing and simulating performance. The testbench code often employs multiple concurrent processes to achieve various objectives. These processes can operate independently or require synchronization to coordinate their actions. Slow I/O operations might block simulation threads, causing the operating system to switch to another thread. In such scenarios, introducing additional threads can enhance performance.
+The test base consist of multiple testbench files, in this example test base is created from two testbenches. The testbenches (written in VHDL or SV) have the main simulation processes. The simulation process is organized into smaller test cases. These test cases can run simultaneously on multiple threads, enabling parallel data calculation and significantly improving simulating performance. The python runner via the testbench code often employs multiple concurrent processes to achieve various objectives. These processes can operate independently or require synchronization to coordinate their actions. Slow I/O operations might block simulation threads, causing the operating system to switch to another thread. In such scenarios, introducing additional threads can enhance performance.
 
 ## Example Workflow
 
@@ -123,15 +123,18 @@ The following diagram outlines the workflow of this example:
 3. Data Profiler:
 
     The Python run-script interfaces with a data profiler tool, which collects performance and profiling data during the test runs. The data profiler uses one of the Aldec's simulator at a time.
+    
+4. Additional files:
 
-4. Testbenches:
+   - rand_enc: Makes generics-based tests randomized, and modyfies the input data to appropriate format, uses Python pycryptodome library.
+
+5. Testbenches:
 
     The organized tests from the Python run-script are executed within specific testbenches:
    - tb_enc_hardcoded: Executes the hardcoded tests.
    - tb_enc_generics: Executes the generics-based tests.
-   - rand_enc: Makes generics-based tests randomized, and modyfies the input data to appropriate format, uses Python pycryptodome library.
 
-5. Results:
+6. Results:
 
     The outputs from the testbenches are compiled into a results container, which includes:
    - VUnit Summary: A summary of the test results, generated by VUnit, and displayed in the console window.
@@ -140,8 +143,8 @@ The following diagram outlines the workflow of this example:
 # Running the Example
 
 To run the example successfully, ensure that you have:
-- Python3,
-- the vunit_hdl and pycryptodome Python libraries,
+- Python3 in at least 3.8 version,
+- vunit_hdl and pycryptodome Python libraries,
 - valid Aldec simulator license.
 
 For multithread testing, make sure you have the appropriate number of licenses, as each thread requires a separate license. Instructions for installing the license on Linux/Unix are available upon [this link](https://www.aldec.com/en/support/resources/documentation/faq/1279) and for Windows [here](https://www.aldec.com/en/support/resources/documentation/faq/1280).
@@ -150,7 +153,7 @@ For multithread testing, make sure you have the appropriate number of licenses, 
 
 To run the example on a Linux/Unix system using Riviera-PRO, follow these steps:
 
-1. Download Python 3 (version 6.3 or higher):
+1. Download Python 3 (version 3.8 or higher):
    ```console
    sudo apt update && sudo apt install python3 -y
    ```
@@ -169,6 +172,11 @@ To run the example on a Linux/Unix system using Riviera-PRO, follow these steps:
    ```console
    pip install pycryptodome
    ```
+   
+(Optional) Install necessary packages using command below:
+   ```console
+   pip install -r vunit/aes-encryption/requirements.txt
+   ```
 
 5. Add Riviera-PRO installation bin directory to the PATH variable:
    ```console
@@ -176,7 +184,7 @@ To run the example on a Linux/Unix system using Riviera-PRO, follow these steps:
    ```
 6. Navigate to the project directory:
    ```console
-   cd AES-ENC_VHDL
+   cd vunit/aes-encryption
    ```
 
 7. Run the example:
@@ -189,13 +197,13 @@ To run the example on a Linux/Unix system using Riviera-PRO, follow these steps:
      python3 run.py -p <threads_number>
      ```
 
-For additional options, refer to the [VUnit Command Line Interface](https://vunit.github.io/cli.html#cli).
+For additional options of running the example, please refer to the [VUnit Command Line Interface](https://vunit.github.io/cli.html#cli).
 
 ## Running on Windows with Active-HDL
    
 To run the example with Active-HDL, follow these steps:
    
-1. Download Python 3 (version 6.3 or higher):
+1. Download Python 3 (version 3.8 or higher):
    Download it from the official [Python website](https://www.python.org/downloads/). If needed, you can find a step-by-step installation guide [here](https://www.geeksforgeeks.org/how-to-install-python-on-windows/).
    
 2. Install pip via CMD:
@@ -214,6 +222,11 @@ To run the example with Active-HDL, follow these steps:
    pip install pycryptodome
    ```
    
+(Optional) Install necessary packages using command below:
+   ```console
+   pip install -r vunit/aes-encryption/requirements.txt
+   ```
+   
 5. Add Active-HDL installation bin directory to the PATH variable:
    ```console
    set PATH=<avhdl_installdir>\bin;%PATH%
@@ -221,7 +234,7 @@ To run the example with Active-HDL, follow these steps:
    
 6. Navigate to the project directory:
    ```console
-   cd AES-ENC_VHDL
+   cd vunit/aes-encryption
    ```
    
 7. Run the example:
@@ -237,7 +250,7 @@ To run the example with Active-HDL, follow these steps:
 ---
 **NOTE**
 
-There is a known issue in Active-HDL related to running examples on multiple threads, but a solution is available in the form of a readily available patch. To apply this patch, follow steps described in the [Data Profiling with Active-HDL](#data-profiling-with-active-hdl).
+There is a known issue in Active-HDL related to running examples on multiple threads, but a solution is available as an available patch. To apply this patch, follow steps described in the [Data Profiling with Active-HDL](#data-profiling-with-active-hdl).
 
 For more information about this problem, refer to [this issue](https://github.com/VUnit/vunit/issues/862).
 
@@ -247,7 +260,7 @@ For more information about this problem, refer to [this issue](https://github.co
 
 <a name="multi_sims"></a>1. Using Multiple Simulators
 
-VUnit uses the simulator whose bin directory was last added to the PATH. If multiple simulators are installed, you can specify the simulator by setting the VUNIT_SIMULATOR environment variable. Options for this variable can be found [here](https://vunit.github.io/cli.html#environment-variables), along with additional guidance.
+VUnit uses the simulator which bin directory was last added to the PATH. If multiple simulators are installed, you can specify the simulator by setting the VUNIT_SIMULATOR environment variable. Various options for setting this variable can be found [here](https://vunit.github.io/cli.html#environment-variables), along with additional guidance.
 
 To set Riviera-PRO as the default simulator:
 
@@ -270,7 +283,11 @@ set VUNIT_SIMULATOR=activehdl
 
 2. Running with different simulator versions
 
-When running tests with different simulator versions, recompilation is necessary, as the source code needs to be recompiled for each version. To avoid test failures, you can delete the 'vunit_out/<simulator_name>' directory or modify the output_path variable in the 'run.py' script. For further assistance, refer to the information provided in [this link](https://vunit.github.io/run/user_guide.html#special-paths).
+When running tests with different simulator versions, recompilation is necessary, as the source code needs to be recompiled for each version. To avoid test failures, you can clean the last copilation results using special console line interface (CLI) option:
+```console
+python3 run.py --clean
+```
+ or modify the output_path variable in the 'run.py' script. For further assistance, refer to the information provided in [this link](https://vunit.github.io/run/user_guide.html#special-paths).
 
 3. Running the Example on Windows with Riviera-PRO
 
@@ -303,6 +320,16 @@ To set the path for Active-HDL:
 set VUNIT_RIVIERA_PATH=<avhdl_installdir>\bin
 ```
 
+- Set the environment variables for the VUNIT_<SIMULATOR_NAME>_PATH and VUNIT_SIMULATOR in the Python runner script:
+
+```console
+# Set the simulator
+simulator = os.environ['VUNIT_SIMULATOR'] = 'rivierapro' # rivierapro | activehdl
+# Set the path to the simulator
+#os.environ['VUNIT_ACTIVEHDL_PATH'] = 'ActiveHDL/bin/directory'
+#os.environ['VUNIT_RIVIERAPRO_PATH'] = 'RivieraPRO/bin/directory'
+```
+
 - Alternatively, for Riviera-PRO, you can source the <riviera_installdir>/etc/setenv file to automatically set the PATH. Please note that this option is only available for Riviera-PRO (the setenv file does not exist for Active-HDL).
 
 - Another option is to select the checkbox that allows you to add the installation folder of the simulator to the PATH environment variable. This will automatically add the 'bin' directory of the simulator to the PATH environment variable. However, if you have multiple simulators in the PATH variable, VUnit will prioritize the last one that was added. Therefore, it is essential to select the specific simulator you wish to use. Further details can be found [here](#multi_sims).
@@ -311,27 +338,21 @@ set VUNIT_RIVIERA_PATH=<avhdl_installdir>\bin
 
 ## Data Profiling with Riviera-PRO
 
-To use the logic data profiler with Riviera-PRO, apply the necessary patch and generate the profiler report, locate the vunit_hdl Python package by running the following command in the terminal:
+To use the logic data profiler with Riviera-PRO generate the profiler report. Following steps will guide you through the whole process.
+
+Run the run.py script to generate profiler output files:
 
 ```console
-pip show vunit_hdl
+python3 run.py
 ```
 
-![Example VUnit Package location in Ubuntu OS](img/VUnit_Package_location_in_Ubuntu_OS.png)
-
-Next, navigate to '<vunit_hdl_location>/vunit/sim_if' and replace the 'factory.py' and 'rivierapro.py' filers with the versions located in the 'aes-encryption/patch' directory of this project.
-
-Once the replacement is complete, uncomment line 92 in the 'run.py' script to enable logic profiling.
-
-![Uncommented line with enabled Data Profiling](img/Uncommented_line_with_enabled_Data_Profiling.png)
-
-Afterward, you can generate profiled data by running the example. When the example finishes, launch the Riviera-PRO simulator from the 'aes-encryption' directory. In the Riviera-PRO GUI console, enter the following command:
+When the example finishes, launch the Riviera-PRO simulator from the 'aes-encryption' directory. In the Riviera-PRO GUI console, enter the following command:
 
 ```console
-profiler report -tbp $curdir/vunit_out/test_output/<specific_test_directory>/rivierapro/Profiler/profiler.tbp -html profiler_report.html
+profiler report -tbp $curdir/profiling_data/<specific_test_directory>/profiler.tbp -html <profiler_report_name>.html
 ```
 
-This command will generate a 'profiler_report.html' file in the 'aes-encryption' directory, which you can open by either double-click it to open it in Riviera or navigate to the example directory and open it via your default browser.
+This command will generate a <profiler_report_name> file in the 'aes-encryption' directory, which you can open by either double-click it to open it in Riviera or navigate to the example directory and open it via your default browser.
 
 Below is an example of the data profiling results:
 
@@ -353,13 +374,9 @@ pip show vunit_hdl
 
 ![Example VUnit Package location in Windows OS](img/VUnit_Package_location_in_Windows_OS.png)
 
-Replace files named 'factory.py' and 'activehdl.py' in <vunit_hdl_location>/vunit/sim_if directory with the files with the same name that are present in the aes-encryption/patch directory in the project.
+Replace file named 'activehdl.py' in <vunit_hdl_library_location>/vunit/sim_if directory with the files with the same name that are present in the aes-encryption/patch directory in the project.
 
-Next, navigate to the run.py file and uncomment line 92 to enable data profiling in Active-HDL.
-
-![Uncommented line with enabled Data Profiling](img/Uncommented_line_with_enabled_Data_Profiling.png)
-
-Run the run.py script in GUI mode using:
+Next, run the run.py script in GUI mode using:
 
 ```console
 python run.py -g
@@ -384,10 +401,10 @@ endsim
 After finish of the simulation profiler results were written to specific folder. Generate profiler report from obtained file using Active-HDL command prompt. In this case profiler report will be generated in the HTML format, but it is possible to change it to other formats.
 
 ```console
-profiler report -tbp $dsn/../../../Profiler/profiler.tbp -html $dsn/../../../Profiler/<profiler_report_name>.html
+profiler report -tbp $dsn/../../../../../../profiling_data/<specific_test_directory>/profiler.tbp -html $dsn/../../../../../../<profiler_report_name>.html
 ```
 
-Profiler report will be stored in the aes-encryption/vunit_out/test_output/<specific_test_directory>/Profiler directory. Example view of the profiler report is shown below.
+Profiler report will be stored in the aes-encryption directory. Example view of the profiler report is shown below.
 
 ![Example Profiler Report in Active-HDL](img/Example_Profiler_Report_in_Active-HDL.png)
 
@@ -481,7 +498,7 @@ Moreover, a noticeable difference in simulator launch times can be observed betw
 
 # Revised Example
 
-For detailed guidance on adding additional test cases, selecting specific tests, or integrating test suites across one or multiple projects, refer to the third entry in Aldec's VUnit blog series. This blog covers essential modifications, such as adjusting the number of tests, tailoring the testing approach to fit your needs, and incorporating new tests. You can explore these practical steps in more detail  [here](https://www.aldec.com/en/company/blog/196--navigating-vunit-a-practical-guide-to-modyfing-testing-approaches).
+For detailed guidance on adding additional test cases, selecting specific tests, or integrating test suites across one or multiple projects, refer to the third entry in Aldec's VUnit blog series. This blog covers essential modifications, such as adjusting the number of tests, tailoring the testing approach to fit your needs, and incorporating new tests. You can explore these practical steps in more detail  [here](https://www.aldec.com/en/company/blog/196--navigating-vunit-a-practical-guide-to-modyfying-testing-approaches).
 
 
 # Creating Own Example
