@@ -28,10 +28,10 @@ vu.add_vhdl_builtins()
 # Create library 'lib'
 lib = vu.add_library("lib")
 
-# Add all files ending in .vhd in src directory to library
+# Add all files ending with .vhd in src directory to library
 lib.add_source_files(root / "src" / "*.vhd")
 
-# Add all files ending in .vhd in tb directory to library
+# Add all files ending with .vhd in tb directory to library
 lib.add_source_files(root / "tb" / "*.vhd")
 
 # Helper functions for configure profiling
