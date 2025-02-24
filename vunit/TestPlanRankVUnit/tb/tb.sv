@@ -5,9 +5,6 @@
 // $Revision: 357294 $
 // VUnit modification: 2024-11-18 14:56 (Mon, 18 Nov 2024)
 
-//`include "/home/mibar/.local/vunit_org/lib/python3.12/site-packages/vunit/verilog/vunit_pkg.sv"
-//`include "/home/mibar/.local/vunit_org/lib/python3.12/site-packages/vunit/verilog/include/vunit_defines.svh"
-
 `include "vunit_defines.svh"
 
 module tb;
