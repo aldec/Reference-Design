@@ -22,10 +22,7 @@ OR
 
 Install necessary packages using command below:
 
-**2.1.**
-   ```console
-   pip install -r requirements.txt
-   ```
+**2.1.** ```pip install -r requirements.txt```
 
 ## 3. Running an Example
 
