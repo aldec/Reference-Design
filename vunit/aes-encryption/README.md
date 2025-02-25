@@ -137,9 +137,9 @@ To use logic data profiler with Active-HDL apply the necessary patch and generat
 
 **4.2.6.** In the Active-HDL console type the following command to generate profiler report:
 
-```profiler report -tbp $dsn/../../../Profiler/profiler.tbp -html $dsn/../../../Profiler/<profiler_report_name>.html```
+```profiler report -tbp $dsn/../../../../../../profiling_data/<specific_test_directory>/profiler.tbp -html $dsn/../../../../../../<profiler_report_name>.html```
 
-Profiler Report will be stored in the aes-encryption/vunit_out/test_output/<specific_test_directory>/Profiler directory.
+Profiler Report will be stored in the aes-encryption directory.
 
 **4.2.7.** Open Profiler Report file for review the profiling results
 
