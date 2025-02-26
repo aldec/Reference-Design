@@ -34,7 +34,7 @@ lib.add_source_files(root / "src" / "*.vhd")
 # Add all files ending with .vhd in tb directory to library
 lib.add_source_files(root / "tb" / "*.vhd")
 
-# Helper functions for configure profiling
+# Profiler configuration functions
 def profiling_sim_args(name=None):
     profiling_dir = root / "profiling_data" / name
     match simulator:
