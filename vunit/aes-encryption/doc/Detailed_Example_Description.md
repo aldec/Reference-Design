@@ -336,6 +336,36 @@ simulator = os.environ['VUNIT_SIMULATOR'] = 'rivierapro' # rivierapro | activehd
 
 # Data Profiling with Aldec's Simulators
 
+## Data Profiling Configuration Functions
+
+Setting various configuration aspects based on individual needs requires the use of special configuration functions. In this particular example, some of the configuration functions were deployed to modify the output path for the profiler files. These functions are located within the run.py script.
+
+![Profiler Configuration Functions](img/profiler_configuration_functions.png)
+
+All three functions are designed to be compatible with both Riviera-PRO and ActiveHDL. Each function serves a specific purpose:
+
+- **profiling_sim_args()** : Specifies the simulation options and sets the output path for the profiler files.
+
+- **profiling_options()** : Enables the simulation options defined in the profiling_sim_args() function. This function is particularly useful for generics-based tests.
+
+- **enable_profiling()** : Enables the simulation options defined in the profiling_sim_args() function. This function is intended for hardcoded-based tests.
+
+The configuration function for hardcoded tests can be invoked by adding the following line to the run.py script:
+
+```console
+enable_profiling(test)
+```
+
+Please ensure this line is added after **test** value declaration.
+
+![Invoking the enable_profiling Function](img/invoking_enable_profiling_function.png)
+
+For tests that use generics, the configuration function can be added as a **sim_options** parameter in the test configuration.
+
+![Setting the profiling_options inside test config](img/setting_profiling_options_for_test.png)
+
+By utilizing these functions during the execution of the example, a 'profiling_data' directory will be created. This directory will contain subdirectories named after the respective test cases.
+
 ## Data Profiling with Riviera-PRO
 
 To use the logic data profiler with Riviera-PRO generate the profiler report. Following steps will guide you through the whole process.
@@ -498,7 +528,7 @@ Moreover, a noticeable difference in simulator launch times can be observed betw
 
 # Revised Example
 
-For detailed guidance on adding additional test cases, selecting specific tests, or integrating test suites across one or multiple projects, refer to the third entry in Aldec's VUnit blog series. This blog covers essential modifications, such as adjusting the number of tests, tailoring the testing approach to fit your needs, and incorporating new tests. You can explore these practical steps in more detail  [here](https://www.aldec.com/en/company/blog/196--navigating-vunit-a-practical-guide-to-modyfying-testing-approaches).
+For detailed guidance on adding additional test cases, selecting specific tests, or integrating test suites across one or multiple projects, refer to the third entry in Aldec's VUnit blog series. This blog covers essential modifications, such as adjusting the number of tests, tailoring the testing approach to fit your needs, and incorporating new tests. You can explore these practical steps in more detail  [here](https://www.aldec.com/en/company/blog/197--navigating-vunit-a-practical-guide-to-modyfying-testing-approaches).
 
 
 # Creating Own Example
