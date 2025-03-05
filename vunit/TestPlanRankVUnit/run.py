@@ -25,7 +25,7 @@ lib.set_sim_option("enable_coverage", True)
 
 tb = lib.test_bench("tb")
 
-lib.set_sim_option("rivierapro.vsim_flags", ["-acdb +access +r+m+base64_enc -acdb_cov sbaecmtf"])
+lib.set_sim_option("rivierapro.vsim_flags", ["-O2 -acdb +access +r+m+base64_enc -acdb_cov sbaecmtf"])
 
 # toggle coverage 
 lib.set_sim_option("rivierapro.init_files.before_run", ["./src/toggle.do"])
