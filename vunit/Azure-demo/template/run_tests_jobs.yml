@@ -1,0 +1,40 @@
+parameters:
+- name: job_name  # defaults for any parameters that aren't specified
+  default: ''
+- name: tests
+  default: ''
+- name: vunit_p
+  default: '1'
+- name: contribution
+
+jobs:
+  - job: ${{ parameters.job_name }}
+    pool:
+      name: Default
+
+    container:
+      image: aldecdemo.azurecr.io/aldec/riviera-pro:vunit
+      endpoint: aldec-demo-acr-connection
+
+    steps:
+      - script: python3 run.py -x report.xml -p ${{ parameters.vunit_p }} ${{ parameters.tests }}
+        env:
+          CONTRIBUTION: ${{ parameters.contribution }}
+        displayName: 'Run VUnit tests'
+        workingDirectory: '.'
+
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFiles: 'report.xml'
+          testRunTitle: 'Publish test results for VUnit tests'
+
+      - task: CopyFiles@2
+        displayName: 'Copy ACDB files'
+        inputs:
+          contents: '**/vunit_out/**/rivierapro/coverage.acdb'
+          targetFolder: '$(Pipeline.Workspace)/acdb'
+
+      - publish: '$(Pipeline.Workspace)/acdb'
+        displayName: 'Publish ACDB artifacts'
+        artifact: '${{ parameters.job_name }}_acdb'

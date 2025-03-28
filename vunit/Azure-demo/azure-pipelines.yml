@@ -1,0 +1,78 @@
+trigger:
+- master
+
+parameters:
+- name: CONTRIBUTION
+  displayName: "Run only contribution tests"
+  type: string
+  default: 0
+  values:
+  - 0
+  - 1
+- name: VUNIT_P
+  displayName: "VUNIT multiple threads"
+  type: string
+  default: 1
+- name: tests_jobs
+  type: object
+  default:
+  - job_name: 'run_tests_1'
+    tests: 'lib.tb_enc_generics.*'
+  - job_name: 'run_tests_2'
+    tests: 'lib.tb_enc_hardcoded.*'
+
+jobs:
+- ${{ each tests_job in parameters.tests_jobs }} :
+  - template: templates/run_tests_jobs.yml
+    parameters:
+      job_name: ${{ tests_job.job_name }}
+      tests: ${{ tests_job.tests }}
+      contribution: ${{ parameters.CONTRIBUTION }}
+      vunit_p: ${{ parameters.VUNIT_P }}
+
+- job: publish_coverage
+  pool:
+    name: Default
+
+  container:
+    image: aldecdemo.azurecr.io/aldec/riviera-pro:vunit
+    endpoint: aldec-demo-acr-connection
+
+  dependsOn:
+  - ${{ each tests_job in parameters.tests_jobs }} :
+    - ${{ tests_job.job_name }}
+
+  steps:
+    - ${{ each tests_job in parameters.tests_jobs }} :
+      - task: DownloadPipelineArtifact@2
+        displayName: 'Download artifact ${{ tests_job.job_name }}_acdb'
+        inputs:
+          buildType: current
+          artifactName: ${{ tests_job.job_name }}_acdb
+          targetPath: '$(Build.SourcesDirectory)'
+
+    - script: vsim -c -do acdb.do
+      displayName: 'Merge acdb and generate coverage report'
+      workingDirectory: 'vunit/aes-encryption'
+
+    - script: |
+        acdb2xml -i acdb/results.acdb -o acdb/results.xml
+        python3 ucdb2cobertura.py --units -i acdb/results.xml -o acdb/cobertura.xml
+      displayName: 'Convert coverage to cobertura format'
+      workingDirectory: 'vunit/aes-encryption'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'vunit/aes-encryption/acdb'
+        artifactName: Coverage
+
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk 7.0.x'
+      inputs:
+        version: 7.0.x
+
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: 'vunit/aes-encryption/acdb/cobertura.xml'
+        pathToSources: 'vunit/aes-encryption/vunit_out/test_output'
