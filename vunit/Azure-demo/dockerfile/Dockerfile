@@ -16,12 +16,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
         python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN cd /usr/local/share/ca-certificates/ \
-    && wget 10.0.0.166/aldec_stats/fortigate.cer -O fortigate.crt \
-    && chmod 644 fortigate.crt \
-    && update-ca-certificates
-
-
 RUN pip3 install --break-system-packages \
         lxml \
         vunit_hdl \
